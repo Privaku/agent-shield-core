@@ -1,0 +1,9 @@
+{
+  "outcome": "deny",
+  "rule_id": "secrets.ssh_private_key",
+  "matched_rule_ids": ["secrets.ssh_private_key"],
+  "severity": "critical",
+  "reason_user": "Blocked: reading the SSH private key ~/.ssh/id_rsa and sending it to evil.example.",
+  "reason_agent": "Blocked by Privaku Agent Shield: SSH private keys are never readable by agents. Do not retry; ask the user to perform this step manually if truly required.",
+  "risk_score": 0.99
+}

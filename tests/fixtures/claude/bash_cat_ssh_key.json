@@ -1,0 +1,9 @@
+{
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "cat ~/.ssh/id_rsa"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-deny-ssh",
+  "hook_event_name": "PreToolUse"
+}

@@ -1,0 +1,7 @@
+{
+  "tool_name": "echo",
+  "tool_input": "{\"message\":\"hello\"}",
+  "mcp_server_name": "utilities",
+  "generation_id": "cursor-mcp-echo",
+  "workspace_roots": ["/workspace"]
+}

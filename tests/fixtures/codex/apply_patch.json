@@ -1,0 +1,9 @@
+{
+  "tool_name": "apply_patch",
+  "tool_input": {
+    "patch": "*** Begin Patch\n*** Update File: src/lib.rs\n@@\n-pub const READY: bool = false;\n+pub const READY: bool = true;\n*** End Patch\n"
+  },
+  "cwd": "/workspace",
+  "session_id": "codex-allow-patch",
+  "hook_event_name": "PreToolUse"
+}

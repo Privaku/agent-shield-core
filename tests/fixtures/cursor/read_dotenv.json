@@ -1,0 +1,6 @@
+{
+  "hook_event_name": "beforeReadFile",
+  "file_path": ".env",
+  "conversation_id": "cursor-read-dotenv",
+  "workspace_roots": ["/workspace"]
+}

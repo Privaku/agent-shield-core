@@ -1,0 +1,82 @@
+version: 1
+families:
+  - id: secrets.ssh_private_key
+    description: SSH private keys
+    paths:
+      - ~/.ssh/id_*
+      - ~/.ssh/*.pem
+      - ~/.ssh/*_key
+    except_paths:
+      - ~/.ssh/*.pub
+      - ~/.ssh/known_hosts
+      - ~/.ssh/config
+
+  - id: secrets.dotenv
+    description: Dotenv secret files
+    paths:
+      - /**/.env
+      - /**/.env.*
+    except_paths:
+      - /**/.env.example
+      - /**/.env.sample
+      - /**/.env.template
+
+  - id: secrets.cloud_credentials
+    description: Cloud and container credentials
+    paths:
+      - ~/.aws/credentials
+      - ~/.aws/config
+      - ~/.config/gcloud/**
+      - ~/.azure/**
+      - ~/.kube/config
+      - ~/.docker/config.json
+      - ~/.oci/**
+
+  - id: secrets.package_tokens
+    description: Package manager and source-control tokens
+    paths:
+      - ~/.npmrc
+      - ~/.pypirc
+      - ~/.netrc
+      - ~/.git-credentials
+      - ~/.config/gh/hosts.yml
+      - ~/.cargo/credentials*
+
+  - id: secrets.browser_data
+    description: Browser cookies and saved logins
+    paths:
+      - ~/Library/Application Support/Google/Chrome/**/Cookies
+      - ~/Library/Application Support/Google/Chrome/**/Login Data
+      - ~/Library/Application Support/Google/Chrome/**/logins.json
+      - ~/Library/Application Support/Firefox/**/Cookies
+      - ~/Library/Application Support/Firefox/**/Login Data
+      - ~/Library/Application Support/Firefox/**/logins.json
+      - ~/Library/Application Support/BraveSoftware/**/Cookies
+      - ~/Library/Application Support/BraveSoftware/**/Login Data
+      - ~/Library/Application Support/BraveSoftware/**/logins.json
+      - ~/Library/Cookies/**
+
+  - id: persist.autostart
+    description: Launch agents and shell startup files
+    paths:
+      - ~/Library/LaunchAgents/**
+      - /Library/Launch*
+      - /Library/Launch*/**
+      - /Library/LaunchAgents/**
+      - /Library/LaunchDaemons/**
+      - ~/.zshrc
+      - ~/.bashrc
+      - ~/.profile
+
+  - id: self.tamper
+    description: Agent Shield configuration, policy, audit, and hook files
+    paths:
+      - ~/.config/privaku/agent-shield/**
+      - ~/.local/state/privaku/**
+      - ~/Library/Application Support/Privaku/**
+      - ~/Library/Logs/Privaku/agent-shield/**
+      - ~/.claude/settings.json
+      - ~/.cursor/hooks.json
+      - ~/.codex/hooks.json
+      - ~/.privaku/**
+      - .agent-shield.yaml

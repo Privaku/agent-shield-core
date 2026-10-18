@@ -1,0 +1,23 @@
+title = "Agent Shield core"
+
+[extend]
+useDefault = true
+
+# Default gitleaks merges paths and regexes from its built-in config.
+# It does not merge stopwords, so the built-in stopword is repeated here.
+# The regexes below are synthetic detector fixtures, not credentials.
+[allowlist]
+description = "Synthetic detector fixtures. Not credentials."
+stopwords = [
+  "abcdefghijklmnopqrstuvwxyz",
+]
+regexes = [
+  '''AKIA1234567890ABCDEF''',
+  '''xoxa-12345ABCDE''',
+  '''eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiIxMjM0NTY3ODkwIn0\.ABCDEFGHIJKLMNOP''',
+  '''eyJraWQiOiIxMjM0NSJ9\.eyJhdWQiOiJsb2NhbCJ9\.ghijklmnopqrstuv''',
+  '''xoxb-1234567890-1234567890-abcdefghijklmnopqrstuvwx''',
+]
+paths = [
+  '''(?:^|/)target(?:/|$)''',
+]

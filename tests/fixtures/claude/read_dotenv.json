@@ -1,0 +1,9 @@
+{
+  "tool_name": "Read",
+  "tool_input": {
+    "file_path": ".env"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-ask-dotenv",
+  "hook_event_name": "PreToolUse"
+}

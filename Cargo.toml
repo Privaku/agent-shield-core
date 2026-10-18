@@ -1,0 +1,47 @@
+# © 2026 Privaku
+[workspace]
+resolver = "2"
+members = [
+    "crates/shield-core",
+    "crates/shield-audit",
+    "crates/shield-ipc",
+    "crates/shield-mcp",
+    "crates/fake-mcp-server",
+    "crates/agent-shield",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "LicenseRef-PolyForm-Shield-1.0.0"
+publish = false
+authors = ["Privaku <https://privaku.com>"]
+repository = "https://github.com/Privaku/agent-shield-core"
+
+[workspace.dependencies]
+# Core dependencies
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+serde_yaml_ng = "0.10"
+tokio = { version = "1.35", features = ["full"] }
+libc = "0.2"
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Preserve comments and layout when rewriting Codex MCP TOML configs.
+toml_edit = "0.22"
+# Terminal approval UI. MIT OR Apache-2.0; keys a/s/A/d, scripted mock for CI.
+dialoguer = "0.11"
+# Bash AST for the M4 command parser. Both MIT.
+tree-sitter = "0.25"
+tree-sitter-bash = "0.25"
+
+# Testing
+tempfile = "3.10"
+assert_cmd = "2.0"
+predicates = "3.1"
+# Schema validation of protocol fixtures. No default features: that keeps
+# reqwest/rustls (HTTP $ref resolution) out of the tree; all refs are local.
+jsonschema = { version = "0.58", default-features = false }

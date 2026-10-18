@@ -1,0 +1,10 @@
+{
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "~/.zshrc",
+    "content": "export SAFE=value\n"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-ask-zshrc",
+  "hook_event_name": "PreToolUse"
+}

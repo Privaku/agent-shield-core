@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://privaku.com/agent-shield/protocol/v1/approval.schema.json",
+  "title": "Approval",
+  "description": "Messages exchanged with the approval daemon when a decision is ask: an approval_request from the hook, proxy or shim, and an approval_response from the first UI to answer. Mirrors shield-core::model::{ApprovalRequest, ApprovalResponse}.",
+  "oneOf": [
+    { "$ref": "#/$defs/approval_request" },
+    { "$ref": "#/$defs/approval_response" }
+  ],
+  "$defs": {
+    "approval_request": {
+      "title": "ApprovalRequest",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique request id, echoed back in the response.",
+          "type": "string",
+          "minLength": 1
+        },
+        "action_summary": {
+          "description": "One-line, redacted description of the action.",
+          "type": "string"
+        },
+        "rule": {
+          "description": "Id of the rule that asked. Omitted when the risk scorer escalated an otherwise allowed action.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"
+        },
+        "severity": { "$ref": "#/$defs/severity" },
+        "risk": { "$ref": "#/$defs/risk_score" },
+        "reason_user": {
+          "description": "Why the user is being asked, in plain words.",
+          "type": "string"
+        },
+        "agent": { "$ref": "#/$defs/agent_context" }
+      },
+      "required": ["id", "action_summary", "severity", "risk", "reason_user", "agent"],
+      "additionalProperties": false
+    },
+    "approval_response": {
+      "title": "ApprovalResponse",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The id of the request being answered.",
+          "type": "string",
+          "minLength": 1
+        },
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "by": {
+          "description": "Who answered: a UI name (cli, menubar, dialog) or a fail-closed source (timeout, no_ui).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["id", "verdict", "by"],
+      "additionalProperties": false
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["allow_once", "allow_session", "always_allow", "deny"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"]
+    },
+    "risk_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "agent_kind": {
+      "type": "string",
+      "enum": ["claude", "cursor", "codex", "mcp", "shim"]
+    },
+    "agent_context": {
+      "type": "object",
+      "properties": {
+        "agent": { "$ref": "#/$defs/agent_kind" },
+        "session_id": { "type": "string" },
+        "cwd": { "type": "string", "minLength": 1 },
+        "autonomous": { "type": "boolean" }
+      },
+      "required": ["agent", "session_id", "cwd", "autonomous"],
+      "additionalProperties": false
+    }
+  }
+}

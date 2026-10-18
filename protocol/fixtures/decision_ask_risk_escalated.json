@@ -1,0 +1,7 @@
+{
+  "outcome": "ask",
+  "severity": "medium",
+  "reason_user": "No rule matched, but the risk scorer flagged a POST of a large file to an unknown host.",
+  "reason_agent": "Privaku Agent Shield is asking the user because this upload looks risky. Wait for the answer; do not retry with a different host or tool.",
+  "risk_score": 0.82
+}

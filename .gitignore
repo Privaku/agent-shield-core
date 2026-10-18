@@ -1,0 +1,11 @@
+/target/
+**/*.rs.bk
+.DS_Store
+*.swp
+*~
+.env
+.env.local
+/demo/.demo-home/
+/demo/home/
+__pycache__/
+*.pyc

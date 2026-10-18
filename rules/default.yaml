@@ -1,0 +1,308 @@
+# Privaku Agent Shield default policy v1.
+# Override with ~/.config/privaku/agent-shield/policy.yaml or
+# ./.agent-shield.yaml. Critical rules remain protected by the loader.
+
+version: 1
+
+defaults:
+  unmatched: allow          # risk scorer may escalate to ask
+  ask_timeout_seconds: 30
+  on_timeout: deny
+  on_no_ui: deny            # autonomous mode
+  ask_threshold: 0.7
+
+rules:
+  - id: secrets.ssh_private_key
+    description: Reading or copying SSH private keys
+    severity: critical
+    decision: deny
+    match:
+      access: [read, copy, send]
+      paths: ["~/.ssh/id_*", "~/.ssh/*.pem", "~/.ssh/*_key"]
+      except_paths: ["~/.ssh/*.pub", "~/.ssh/known_hosts", "~/.ssh/config"]
+    agent_message: >
+      Blocked by Privaku Agent Shield: SSH private keys are never readable by agents.
+      Do not retry; ask the user to perform this step manually if truly required.
+
+  - id: secrets.dotenv
+    description: Reading or sending dotenv files requires approval
+    severity: high
+    decision: ask
+    match:
+      access: [read, send]
+      paths: ["**/.env", "**/.env.*"]
+      except_paths: ["**/.env.example", "**/.env.sample", "**/.env.template"]
+    agent_message: >
+      Approval is required because dotenv files often contain secrets.
+      Do not retry; ask the user whether this specific access is intended.
+
+  - id: secrets.cloud_credentials
+    description: Accessing cloud and container credentials
+    severity: critical
+    decision: deny
+    match:
+      access: [read, copy, send]
+      paths:
+        - "~/.aws/credentials"
+        - "~/.aws/config"
+        - "~/.config/gcloud/**"
+        - "~/.azure/**"
+        - "~/.kube/config"
+        - "~/.docker/config.json"
+        - "~/.oci/**"
+    agent_message: >
+      Blocked because cloud credentials are never readable by agents.
+      Do not retry; ask the user to perform this credential operation manually.
+
+  - id: secrets.package_tokens
+    description: Accessing package manager and source control tokens
+    severity: critical
+    decision: deny
+    match:
+      access: [read, copy, send]
+      paths:
+        - "~/.npmrc"
+        - "~/.pypirc"
+        - "~/.netrc"
+        - "~/.git-credentials"
+        - "~/.config/gh/hosts.yml"
+        - "~/.cargo/credentials*"
+    agent_message: >
+      Blocked because package and source-control tokens are never readable by agents.
+      Do not retry; ask the user to perform the authenticated step manually.
+
+  - id: secrets.keychain
+    description: Extracting secrets from the macOS keychain
+    severity: critical
+    decision: deny
+    match:
+      program: security
+      args_any: [find-generic-password, find-internet-password, dump-keychain, export]
+    agent_message: >
+      Blocked because agents may not extract keychain secrets.
+      Do not retry; ask the user to perform the keychain operation manually.
+
+  - id: secrets.browser_data
+    description: Accessing browser cookies or saved credentials
+    severity: critical
+    decision: deny
+    match:
+      access: [read, copy, send]
+      paths:
+        - "~/Library/Application Support/Google/Chrome/**/Cookies"
+        - "~/Library/Application Support/Google/Chrome/**/Login Data"
+        - "~/Library/Application Support/Firefox/**/Cookies"
+        - "~/Library/Application Support/Firefox/**/logins.json"
+        - "~/Library/Application Support/BraveSoftware/**/Cookies"
+        - "~/Library/Application Support/BraveSoftware/**/Login Data"
+        - "~/Library/Cookies/**"
+    agent_message: >
+      Blocked because browser cookies and saved logins are private credentials.
+      Do not retry; ask the user to perform this browser-data operation manually.
+
+  - id: secrets.content_in_args
+    description: Secret-looking content appears in action arguments
+    severity: critical
+    decision: ask
+    match:
+      secret_content: true
+    agent_message: >
+      Approval is required because the action contains secret-looking content.
+      Do not retry or expose the value; ask the user how to proceed.
+
+  - id: exfil.secret_to_network
+    description: Sending a secret source to a network destination
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - dataflow: { source: secret_file, sink: network }
+        - { network_sink: true, secret_content: true }
+    agent_message: >
+      Blocked because the action would send secret material over the network.
+      Do not retry; ask the user to handle any intended transfer manually.
+
+  - id: exfil.upload_file
+    description: Uploading a local file to a remote destination
+    severity: high
+    decision: ask
+    match:
+      any:
+        - { program: curl, args_any: ["-T", "-T*", "--upload-file", "--upload-file=*", "-F", "-F*", "--form", "--form=*", "-d", "--data", "--data-binary"] }
+        - { program: wget, args_any: ["--post-file", "--post-file=*"] }
+        - { program: [scp, rsync], access: [send] }
+    agent_message: >
+      Approval is required before an agent uploads a local file.
+      Do not retry; ask the user to confirm the file and destination.
+
+  - id: rce.pipe_to_shell
+    description: Piping a download straight into an interpreter
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - pipeline:
+            - { program: [curl, wget, fetch] }
+            - { program: [sh, bash, zsh, dash, python, python3, perl, ruby, node] }
+        - raw_any: ["*<(curl *)*", "*<(wget *)*", "*$(curl *)*", "*$(wget *)*"]
+    agent_message: >
+      Blocked by Privaku Agent Shield: downloaded scripts must not be piped into a shell.
+      Do not retry; download the script to a file and ask the user to review it.
+
+  - id: rce.decode_and_exec
+    description: Decoding or constructing content and executing it
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - pipeline:
+            - { program: [base64, openssl] }
+            - { program: [sh, bash, zsh, dash, python, python3, perl, ruby, node] }
+        - raw_any: ["*eval*base64*", "*exec(*decode(*", "*exec(*b64decode(*"]
+    agent_message: >
+      Blocked because decoded or dynamically constructed content would be executed.
+      Do not retry; ask the user to review and run the decoded content manually.
+
+  - id: destructive.rm_home_root
+    description: Recursively deleting a home directory or filesystem root
+    severity: critical
+    decision: deny
+    match:
+      program: rm
+      args_any: ["-*r*", "--recursive", "--no-preserve-root"]
+      access: [delete]
+      paths: ["/", "~", "$HOME", "/Users/*"]
+    agent_message: >
+      Blocked because this recursive deletion targets a home directory or filesystem root.
+      Do not retry; ask the user to perform any intended cleanup manually.
+
+  - id: destructive.rm_recursive_outside_ws
+    description: Recursively deleting files outside the current workspace
+    severity: high
+    decision: ask
+    match:
+      program: rm
+      args_any: ["-*r*", "--recursive"]
+      access: [delete]
+      outside_workspace: true
+    agent_message: >
+      Approval is required for recursive deletion outside the workspace.
+      Do not retry; ask the user to confirm the exact target.
+
+  - id: destructive.disk
+    description: Erasing or overwriting a disk device
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - { program: dd, args_any: ["of=/dev/*"] }
+        - { program: "mkfs*" }
+        - { program: diskutil, args_any: [eraseDisk, eraseVolume, partitionDisk] }
+    agent_message: >
+      Blocked because the action could erase or overwrite a disk.
+      Do not retry; ask the user to perform this destructive operation manually.
+
+  - id: destructive.git_history
+    description: Rewriting shared or local Git history
+    severity: medium
+    decision: ask
+    match:
+      any:
+        - { program: git, args_all: [push, "--force", main] }
+        - { program: git, args_all: [push, "--force", master] }
+        - { program: git, args_all: [push, "--force-with-lease", main] }
+        - { program: git, args_all: [push, "--force-with-lease", master] }
+        - { program: git, args_all: [push, "-f", main] }
+        - { program: git, args_all: [push, "-f", master] }
+        - { program: git, args_all: [reset, "--hard"] }
+        - { program: git, args_all: [clean, "-fdx"] }
+        - { program: git, args_all: [clean, "-xfd"] }
+    agent_message: >
+      Approval is required because this Git operation can discard or rewrite history.
+      Do not retry; ask the user to confirm the repository and branch.
+
+  - id: priv.sudo
+    description: Running with elevated privileges or changing privileged ownership
+    severity: high
+    decision: ask
+    match:
+      any:
+        - { program: [sudo, su, doas] }
+        - { program: chmod, args_any: ["+s", "u+s", "g+s", "4???", "2???", "6???"] }
+        - { program: chown, args_any: [root, "root:*"] }
+    agent_message: >
+      Approval is required because this action changes privileges.
+      Do not retry; ask the user to perform or approve the exact privileged step.
+
+  - id: persist.autostart
+    description: Modifying login, startup, or scheduled execution settings
+    severity: high
+    decision: ask
+    match:
+      any:
+        - access: [write, delete]
+          paths:
+            - "~/Library/LaunchAgents/**"
+            - "/Library/LaunchAgents/**"
+            - "/Library/LaunchDaemons/**"
+            - "/Library/StartupItems/**"
+            - "~/.zshrc"
+            - "~/.bashrc"
+            - "~/.profile"
+        - { program: crontab, args_any: ["-e", "-"] }
+        - { program: launchctl, args_any: [load, bootstrap] }
+    agent_message: >
+      Approval is required because this action changes automatic startup behavior.
+      Do not retry; ask the user to confirm the persistence change.
+
+  - id: self.tamper
+    description: Disabling or modifying Agent Shield protections
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - access: [write, delete]
+          paths:
+            - "~/.config/privaku/agent-shield/**"
+            - "**/.agent-shield.yaml"
+            - "~/.privaku/**"
+            - "~/Library/Logs/Privaku/**"
+            - "~/.local/state/privaku/**"
+            - "~/.claude/settings.json"
+            - "~/.codex/hooks.json"
+            - "~/.cursor/hooks.json"
+        - { program: [pkill, killall], args_any: ["*agent-shield*"] }
+    agent_message: >
+      Blocked because agents may not disable or modify Agent Shield protections.
+      Do not retry; ask the user to make any intended configuration change manually.
+
+  - id: net.raw_socket
+    description: Opening a listener or raw reverse-shell connection
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - { program: [nc, ncat, netcat], args_any: ["-l", "-l*", "--listen"] }
+        - raw_any: ["*/dev/tcp/*", "*bash -i*>*"]
+    agent_message: >
+      Blocked because raw listeners and reverse shells are unsafe for agents.
+      Do not retry; ask the user to establish any required connection manually.
+
+  - id: mcp.fs_secret_paths
+    description: MCP filesystem tool access to secret paths
+    severity: critical
+    decision: deny
+    match:
+      any:
+        - mcp: { tool: "*read_file*", arg: "/path" }
+          paths: ["~/.ssh/**", "~/.aws/**", "~/.config/gcloud/**", "~/.azure/**", "~/.kube/config", "~/.docker/config.json", "~/.oci/**", "~/.npmrc", "~/.pypirc", "~/.netrc", "~/.git-credentials", "~/.config/gh/hosts.yml", "~/.cargo/credentials*", "**/.env", "**/.env.*", "~/Library/**/Cookies", "~/Library/**/Login Data", "~/Library/**/logins.json", "~/Library/Cookies/**"]
+          except_paths: ["~/.ssh/*.pub", "~/.ssh/known_hosts", "~/.ssh/config", "**/.env.example", "**/.env.sample", "**/.env.template"]
+        - mcp: { tool: "*get_file_contents*", arg: "/path" }
+          paths: ["~/.ssh/**", "~/.aws/**", "~/.config/gcloud/**", "~/.azure/**", "~/.kube/config", "~/.docker/config.json", "~/.oci/**", "~/.npmrc", "~/.pypirc", "~/.netrc", "~/.git-credentials", "~/.config/gh/hosts.yml", "~/.cargo/credentials*", "**/.env", "**/.env.*", "~/Library/**/Cookies", "~/Library/**/Login Data", "~/Library/**/logins.json", "~/Library/Cookies/**"]
+          except_paths: ["~/.ssh/*.pub", "~/.ssh/known_hosts", "~/.ssh/config", "**/.env.example", "**/.env.sample", "**/.env.template"]
+        - mcp: { tool: "*read_text_file*", arg: "/file_path" }
+          paths: ["~/.ssh/**", "~/.aws/**", "~/.config/gcloud/**", "~/.azure/**", "~/.kube/config", "~/.docker/config.json", "~/.oci/**", "~/.npmrc", "~/.pypirc", "~/.netrc", "~/.git-credentials", "~/.config/gh/hosts.yml", "~/.cargo/credentials*", "**/.env", "**/.env.*", "~/Library/**/Cookies", "~/Library/**/Login Data", "~/Library/**/logins.json", "~/Library/Cookies/**"]
+          except_paths: ["~/.ssh/*.pub", "~/.ssh/known_hosts", "~/.ssh/config", "**/.env.example", "**/.env.sample", "**/.env.template"]
+    agent_message: >
+      Blocked because MCP filesystem tools may not read secret paths.
+      Do not retry with another tool; ask the user to perform this access manually.

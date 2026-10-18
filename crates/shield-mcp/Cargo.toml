@@ -1,0 +1,21 @@
+[package]
+name = "shield-mcp"
+description = "MCP stdio proxy for Agent Shield"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+authors.workspace = true
+
+[dependencies]
+libc = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+shield-audit = { path = "../shield-audit" }
+shield-core = { path = "../shield-core" }
+shield-ipc = { path = "../shield-ipc" }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

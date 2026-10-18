@@ -1,0 +1,5 @@
+{
+  "type": "hello",
+  "role": "client",
+  "version": 1
+}

@@ -1,0 +1,15 @@
+{
+  "type": "approval_request",
+  "id": "req-01HZX4N8Q7",
+  "action_summary": "Read /Users/dev/projects/webapp/.env",
+  "rule": "secrets.dotenv",
+  "severity": "high",
+  "risk": 0.55,
+  "reason_user": "The agent wants to read .env, which usually holds secrets.",
+  "agent": {
+    "agent": "cursor",
+    "session_id": "cur-01HZX4N8",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  }
+}

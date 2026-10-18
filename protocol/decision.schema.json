@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://privaku.com/agent-shield/protocol/v1/decision.schema.json",
+  "title": "Decision",
+  "description": "The policy engine's answer for one action. Mirrors shield-core::model::Decision. Precedence when combining decisions is deny > ask > allow.",
+  "type": "object",
+  "properties": {
+    "outcome": { "$ref": "#/$defs/outcome" },
+    "rule_id": {
+      "description": "Id of the rule that produced this decision. Omitted for unmatched actions and for escalations by the risk scorer.",
+      "$ref": "#/$defs/rule_id"
+    },
+    "matched_rule_ids": {
+      "description": "All policy rules that matched, in policy order.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule_id" },
+      "uniqueItems": true
+    },
+    "severity": { "$ref": "#/$defs/severity" },
+    "reason_user": {
+      "description": "One line for the human approving or reviewing the action.",
+      "type": "string"
+    },
+    "reason_agent": {
+      "description": "Message returned to the agent, written so it re-plans instead of retrying.",
+      "type": "string"
+    },
+    "risk_score": { "$ref": "#/$defs/risk_score" }
+  },
+  "required": ["outcome", "severity", "reason_user", "reason_agent", "risk_score"],
+  "additionalProperties": false,
+  "$defs": {
+    "outcome": {
+      "type": "string",
+      "enum": ["allow", "ask", "deny"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"]
+    },
+    "risk_score": {
+      "description": "Layer 2 risk estimate. Scores at or above the policy ask_threshold escalate an allow to an ask; they never downgrade.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "rule_id": {
+      "description": "Dotted rule identifier, e.g. secrets.ssh_private_key.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*$"
+    }
+  }
+}

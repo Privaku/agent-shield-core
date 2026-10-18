@@ -1,0 +1,9 @@
+{
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "git status"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-allow-git",
+  "hook_event_name": "PreToolUse"
+}

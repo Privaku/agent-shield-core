@@ -1,0 +1,9 @@
+{
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "rm -rf ~"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-deny-rm",
+  "hook_event_name": "PreToolUse"
+}

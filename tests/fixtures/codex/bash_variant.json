@@ -1,0 +1,13 @@
+{
+  "tool_name": "Bash",
+  "tool_input": {
+    "cmd": [
+      "git",
+      "status",
+      "--short"
+    ]
+  },
+  "cwd": "/workspace",
+  "session_id": "codex-allow-bash",
+  "hook_event_name": "PreToolUse"
+}

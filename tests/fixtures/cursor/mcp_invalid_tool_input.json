@@ -1,0 +1,7 @@
+{
+  "tool_name": "echo",
+  "tool_input": "{not-json}",
+  "mcp_server_name": "utilities",
+  "conversation_id": "cursor-mcp-invalid-input",
+  "workspace_roots": ["/workspace"]
+}

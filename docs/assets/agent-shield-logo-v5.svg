@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+<!-- Agent Shield Key-bow P app icon v5: flat left stem, P at 86.5%, optically centred (shifted right for the stem mass; vertically balanced in the inner shield). Geometry from render-brand.swift @7b87d7c. -->
+<path d="M512.0 180.9 L761.9 270.2 L761.9 512.0 C761.9 683.1 649.3 794.7 512.0 843.1 C374.7 794.7 262.1 683.1 262.1 512.0 L262.1 270.2 Z" stroke="#D4B25E" stroke-width="33.8" stroke-linejoin="round" fill="none"/>
+<g transform="translate(527.0 504.1) scale(0.865) translate(-518.7 -506.7)">
+<clipPath id="flat"><rect x="390.9" y="0" width="1024" height="1024"/></clipPath>
+<rect x="390.9" y="307.4" width="49.3" height="427.8" rx="8.9" fill="#D4B25E"/>
+<ellipse cx="517.3" cy="413.4" rx="107.4" ry="113.5" stroke="#D4B25E" stroke-width="43.6" fill="none" clip-path="url(#flat)"/>
+<rect x="440.2" y="582.7" width="73.9" height="35.7" rx="7.1" fill="#D4B25E"/>
+<rect x="440.2" y="637.0" width="50.7" height="35.7" rx="7.1" fill="#D4B25E"/>
+</g>
+</svg>

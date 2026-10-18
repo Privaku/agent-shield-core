@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://privaku.com/agent-shield/protocol/v1/action.schema.json",
+  "title": "Action",
+  "description": "One thing an agent wants to do, plus the context it wants to do it in. Mirrors shield-core::model::Action. The action kind is flattened next to `context` and discriminated by `kind`.",
+  "type": "object",
+  "properties": {
+    "context": { "$ref": "#/$defs/agent_context" },
+    "kind": { "$ref": "#/$defs/action_kind" }
+  },
+  "required": ["context", "kind"],
+  "oneOf": [
+    { "$ref": "#/$defs/shell" },
+    { "$ref": "#/$defs/file_read" },
+    { "$ref": "#/$defs/file_write" },
+    { "$ref": "#/$defs/file_delete" },
+    { "$ref": "#/$defs/network" },
+    { "$ref": "#/$defs/mcp_tool_call" }
+  ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "agent_kind": {
+      "description": "Which integration produced the action.",
+      "type": "string",
+      "enum": ["claude", "cursor", "codex", "mcp", "shim"]
+    },
+    "agent_context": {
+      "type": "object",
+      "properties": {
+        "agent": { "$ref": "#/$defs/agent_kind" },
+        "session_id": { "type": "string" },
+        "cwd": { "$ref": "#/$defs/path" },
+        "autonomous": {
+          "description": "true when no human is available to answer an Ask.",
+          "type": "boolean"
+        }
+      },
+      "required": ["agent", "session_id", "cwd", "autonomous"],
+      "additionalProperties": false
+    },
+    "path": {
+      "description": "A filesystem path as the agent supplied it (not yet normalised).",
+      "type": "string",
+      "minLength": 1
+    },
+    "action_kind": {
+      "type": "string",
+      "enum": ["shell", "file_read", "file_write", "file_delete", "network", "mcp_tool_call"]
+    },
+    "shell": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "shell" },
+        "argv_tree": { "$ref": "#/$defs/argv_tree" },
+        "raw": {
+          "description": "The command line exactly as submitted.",
+          "type": "string"
+        },
+        "cwd": { "$ref": "#/$defs/path" },
+        "obfuscation": {
+          "description": "Obfuscation techniques the parser noticed in `raw`. Omitted when empty.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/obfuscation_flag" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["kind", "argv_tree", "raw", "cwd"]
+    },
+    "obfuscation_flag": {
+      "type": "string",
+      "enum": ["base64_decode", "hex_escape", "var_indirection", "eval_dynamic"]
+    },
+    "file_read": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "file_read" },
+        "path": { "$ref": "#/$defs/path" }
+      },
+      "required": ["kind", "path"]
+    },
+    "file_write": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "file_write" },
+        "path": { "$ref": "#/$defs/path" }
+      },
+      "required": ["kind", "path"]
+    },
+    "file_delete": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "file_delete" },
+        "path": { "$ref": "#/$defs/path" }
+      },
+      "required": ["kind", "path"]
+    },
+    "network": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "network" },
+        "url": { "type": "string", "minLength": 1 },
+        "host": { "type": "string", "minLength": 1 },
+        "method": {
+          "description": "HTTP method or protocol verb (GET, POST, scp, ssh, ...).",
+          "type": "string",
+          "minLength": 1
+        },
+        "body_source": { "$ref": "#/$defs/body_source" }
+      },
+      "required": ["kind"],
+      "anyOf": [{ "required": ["url"] }, { "required": ["host"] }]
+    },
+    "mcp_tool_call": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "mcp_tool_call" },
+        "server": {
+          "description": "Server name as configured in the MCP client.",
+          "type": "string",
+          "minLength": 1
+        },
+        "tool": {
+          "description": "Tool name as sent in tools/call.",
+          "type": "string",
+          "minLength": 1
+        },
+        "args_json": {
+          "description": "The tools/call `arguments` value, verbatim."
+        }
+      },
+      "required": ["kind", "server", "tool", "args_json"]
+    },
+    "body_source": {
+      "description": "Where the body of a network request comes from.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["file", "stdin", "inline"] }
+      },
+      "required": ["type"],
+      "oneOf": [
+        {
+          "properties": {
+            "type": { "const": "file" },
+            "path": { "$ref": "#/$defs/path" }
+          },
+          "required": ["type", "path"],
+          "additionalProperties": false
+        },
+        {
+          "properties": { "type": { "const": "stdin" } },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "type": { "const": "inline" },
+            "text": { "type": "string" }
+          },
+          "required": ["type", "text"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "argv_tree": {
+      "description": "Structured form of a shell command line, discriminated by `node`.",
+      "type": "object",
+      "properties": {
+        "node": {
+          "type": "string",
+          "enum": ["command", "pipeline", "list", "group", "unparsed"]
+        }
+      },
+      "required": ["node"],
+      "oneOf": [
+        {
+          "properties": {
+            "node": { "const": "command" },
+            "argv": {
+              "description": "Program (normalised name) followed by its arguments. Empty for a bare variable assignment or an empty command.",
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "redirects": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/redirect" }
+            },
+            "substitutions": {
+              "description": "Command and process substitutions inside the arguments, and commands run by this command itself (find -exec).",
+              "type": "array",
+              "items": { "$ref": "#/$defs/argv_tree" }
+            },
+            "env": {
+              "description": "Environment assignments in front of the command, as NAME=value.",
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "wrappers": {
+              "description": "Normalised names of wrappers stripped to reach this command, outermost first.",
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "required": ["node", "argv"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "node": { "const": "pipeline" },
+            "commands": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/argv_tree" },
+              "minItems": 2
+            }
+          },
+          "required": ["node", "commands"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "node": { "const": "list" },
+            "op": { "type": "string", "enum": ["and", "or", "then", "background"] },
+            "left": { "$ref": "#/$defs/argv_tree" },
+            "right": { "$ref": "#/$defs/argv_tree" }
+          },
+          "required": ["node", "op", "left", "right"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "node": { "const": "group" },
+            "body": { "$ref": "#/$defs/argv_tree" }
+          },
+          "required": ["node", "body"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "node": { "const": "unparsed" },
+            "raw": { "type": "string" }
+          },
+          "required": ["node", "raw"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "redirect": {
+      "type": "object",
+      "properties": {
+        "fd": { "type": "integer", "minimum": 0 },
+        "op": {
+          "type": "string",
+          "enum": ["read", "write", "append", "read_write", "here_doc", "here_string", "dup"]
+        },
+        "target": { "type": "string" },
+        "body": {
+          "description": "Heredoc text without the delimiter lines. Only present for op here_doc.",
+          "type": "string"
+        }
+      },
+      "required": ["op", "target"],
+      "additionalProperties": false
+    }
+  }
+}

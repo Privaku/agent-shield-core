@@ -1,0 +1,10 @@
+{
+  "tool_name": "WebFetch",
+  "tool_input": {
+    "url": "https://docs.rs/serde/latest/serde/",
+    "prompt": "Summarize this documentation"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-allow-web",
+  "hook_event_name": "PreToolUse"
+}

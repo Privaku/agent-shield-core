@@ -1,0 +1,6 @@
+{
+  "tool_name": "echo",
+  "tool_input": "{\"message\":\"hello\"}",
+  "conversation_id": "cursor-mcp-no-server",
+  "workspace_roots": ["/workspace"]
+}

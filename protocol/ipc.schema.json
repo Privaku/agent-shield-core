@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://privaku.com/agent-shield/protocol/v1/ipc.schema.json",
+  "title": "IpcMessage",
+  "description": "Version 1 JSON-lines messages on the approval daemon UNIX socket. One object per line. Mirrors shield-ipc::protocol::IpcMessage.",
+  "oneOf": [
+    { "$ref": "#/$defs/hello" },
+    { "$ref": "#/$defs/approval_request" },
+    { "$ref": "#/$defs/approval_response" },
+    { "$ref": "#/$defs/subscribe" },
+    { "$ref": "#/$defs/event" },
+    { "$ref": "#/$defs/ping" }
+  ],
+  "$defs": {
+    "hello": {
+      "title": "Hello",
+      "type": "object",
+      "properties": {
+        "type": { "const": "hello" },
+        "role": { "$ref": "#/$defs/role" },
+        "version": {
+          "description": "Protocol version. This build speaks version 1 only.",
+          "type": "integer",
+          "const": 1
+        }
+      },
+      "required": ["type", "role", "version"],
+      "additionalProperties": false
+    },
+    "approval_request": {
+      "title": "IpcApprovalRequest",
+      "description": "An Ask routed from a hook, proxy or shim to the daemon, then broadcast to every connected UI. Payload matches protocol/approval.schema.json approval_request plus the IPC type tag.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "approval_request" },
+        "id": { "type": "string", "minLength": 1 },
+        "action_summary": { "type": "string" },
+        "rule": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"
+        },
+        "severity": { "$ref": "#/$defs/severity" },
+        "risk": { "$ref": "#/$defs/risk_score" },
+        "reason_user": { "type": "string" },
+        "agent": { "$ref": "#/$defs/agent_context" }
+      },
+      "required": ["type", "id", "action_summary", "severity", "risk", "reason_user", "agent"],
+      "additionalProperties": false
+    },
+    "approval_response": {
+      "title": "IpcApprovalResponse",
+      "description": "The first UI answer for an id wins. by is a UI name (cli, menubar, dialog) or a fail-closed source (timeout, no_ui, session_cache).",
+      "type": "object",
+      "properties": {
+        "type": { "const": "approval_response" },
+        "id": { "type": "string", "minLength": 1 },
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "by": { "type": "string", "minLength": 1 }
+      },
+      "required": ["type", "id", "verdict", "by"],
+      "additionalProperties": false
+    },
+    "subscribe": {
+      "title": "Subscribe",
+      "description": "A UI sends this after hello to receive live approval_request and event messages.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "subscribe" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "event": {
+      "title": "Event",
+      "description": "Live decision feed broadcast to subscribed UIs. The nested decision object carries agent, session, rule_id, decision, and the remaining details subscribers need.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "event" },
+        "decision": { "$ref": "#/$defs/decision_event" }
+      },
+      "required": ["type", "decision"],
+      "additionalProperties": false
+    },
+    "ping": {
+      "title": "Ping",
+      "description": "Liveness check. The peer replies with ping.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "ping" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "decision_event": {
+      "title": "DecisionEvent",
+      "type": "object",
+      "properties": {
+        "agent": { "$ref": "#/$defs/agent_kind" },
+        "session": { "type": "string" },
+        "rule_id": {
+          "description": "Id of the rule that produced this decision. Omitted for unmatched actions and risk-scorer escalations.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*$"
+        },
+        "decision": { "$ref": "#/$defs/outcome" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "risk_score": { "$ref": "#/$defs/risk_score" },
+        "reason_user": { "type": "string" },
+        "reason_agent": { "type": "string" },
+        "matched_rule_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*$"
+          },
+          "uniqueItems": true
+        },
+        "action_summary": { "type": "string" }
+      },
+      "required": ["agent", "session", "decision", "severity", "risk_score", "reason_user", "reason_agent"],
+      "additionalProperties": false
+    },
+    "role": {
+      "type": "string",
+      "enum": ["client", "ui"]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["allow_once", "allow_session", "always_allow", "deny"]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["allow", "ask", "deny"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"]
+    },
+    "risk_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "agent_kind": {
+      "type": "string",
+      "enum": ["claude", "cursor", "codex", "mcp", "shim"]
+    },
+    "agent_context": {
+      "type": "object",
+      "properties": {
+        "agent": { "$ref": "#/$defs/agent_kind" },
+        "session_id": { "type": "string" },
+        "cwd": { "type": "string", "minLength": 1 },
+        "autonomous": { "type": "boolean" }
+      },
+      "required": ["agent", "session_id", "cwd", "autonomous"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "outcome": "allow",
+  "severity": "info",
+  "reason_user": "No rule matched",
+  "reason_agent": "Allowed by Privaku Agent Shield.",
+  "risk_score": 0.02
+}

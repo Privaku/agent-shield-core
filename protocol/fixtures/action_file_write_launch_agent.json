@@ -1,0 +1,10 @@
+{
+  "context": {
+    "agent": "claude",
+    "session_id": "cc-7f3a2b1c",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  },
+  "kind": "file_write",
+  "path": "/Users/dev/Library/LaunchAgents/com.example.updater.plist"
+}

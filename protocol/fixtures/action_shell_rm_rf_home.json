@@ -1,0 +1,17 @@
+{
+  "context": {
+    "agent": "codex",
+    "session_id": "codex-5d2e",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": true
+  },
+  "kind": "shell",
+  "raw": "cd / && rm -rf ~",
+  "cwd": "/Users/dev/projects/webapp",
+  "argv_tree": {
+    "node": "list",
+    "op": "and",
+    "left": { "node": "command", "argv": ["cd", "/"] },
+    "right": { "node": "command", "argv": ["rm", "-rf", "~"] }
+  }
+}

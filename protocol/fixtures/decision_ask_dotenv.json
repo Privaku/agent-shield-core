@@ -1,0 +1,9 @@
+{
+  "outcome": "ask",
+  "rule_id": "secrets.dotenv",
+  "matched_rule_ids": ["secrets.dotenv"],
+  "severity": "high",
+  "reason_user": "The agent wants to read .env, which usually holds secrets.",
+  "reason_agent": "Privaku Agent Shield is asking the user before .env can be read. Wait for the answer; do not retry or read the file another way.",
+  "risk_score": 0.55
+}

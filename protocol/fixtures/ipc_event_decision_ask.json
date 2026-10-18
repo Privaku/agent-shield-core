@@ -1,0 +1,15 @@
+{
+  "type": "event",
+  "decision": {
+    "agent": "cursor",
+    "session": "cur-01HZX4N8",
+    "rule_id": "secrets.dotenv",
+    "decision": "ask",
+    "severity": "high",
+    "risk_score": 0.55,
+    "reason_user": "The agent wants to read .env, which usually holds secrets.",
+    "reason_agent": "Privaku Agent Shield is asking the user before .env can be read. Wait for the answer; do not retry or read the file another way.",
+    "matched_rule_ids": ["secrets.dotenv"],
+    "action_summary": "Read /Users/dev/projects/webapp/.env"
+  }
+}

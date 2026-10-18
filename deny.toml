@@ -1,0 +1,46 @@
+# cargo-deny configuration for the Agent Shield core.
+# © 2026 Privaku
+# https://embarkstudios.github.io/cargo-deny/
+# Config for cargo-deny 0.20+
+
+[graph]
+targets = []
+all-features = false
+
+[advisories]
+db-path = "~/.cargo/advisory-db"
+ignore = []
+
+[licenses.private]
+# The workspace itself is PolyForm Shield 1.0.0 (not an SPDX licence).
+# Third-party crates stay on the allowlist below.
+ignore = true
+
+[licenses]
+confidence-threshold = 0.8
+# The allowlist is policy, not a description of the current tree.
+unused-allowed-license = "allow"
+# MPL-2.0 only as an unmodified dependency.
+# Forbidden (never add): GPL, AGPL, LGPL, SSPL, BUSL, CC-BY-NC, non-commercial.
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unlicense",
+    "CC0-1.0",
+    "MPL-2.0",
+]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

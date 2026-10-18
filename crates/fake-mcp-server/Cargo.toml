@@ -1,0 +1,15 @@
+[package]
+name = "fake-mcp-server"
+description = "Test-only MCP stdio server for Agent Shield"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "fake-mcp-server"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = { workspace = true }

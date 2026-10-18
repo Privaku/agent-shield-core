@@ -1,0 +1,6 @@
+{
+  "command": "npm test",
+  "cwd": "/workspace",
+  "conversation_id": "cursor-shell-allow",
+  "workspace_roots": ["/workspace"]
+}

@@ -1,0 +1,9 @@
+{
+  "tool_name": "Teleport",
+  "tool_input": {
+    "target": "moon"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-ask-unknown",
+  "hook_event_name": "PreToolUse"
+}

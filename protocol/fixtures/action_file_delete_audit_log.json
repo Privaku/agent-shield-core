@@ -1,0 +1,10 @@
+{
+  "context": {
+    "agent": "codex",
+    "session_id": "codex-5d2e",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  },
+  "kind": "file_delete",
+  "path": "/Users/dev/Library/Logs/Privaku/agent-shield/audit.jsonl"
+}

@@ -1,0 +1,12 @@
+{
+  "context": {
+    "agent": "codex",
+    "session_id": "codex-77aa",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  },
+  "kind": "shell",
+  "raw": "r${IFS}m${IFS}-rf${IFS}~",
+  "cwd": "/Users/dev/projects/webapp",
+  "argv_tree": { "node": "unparsed", "raw": "r${IFS}m${IFS}-rf${IFS}~" }
+}

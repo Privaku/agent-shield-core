@@ -1,0 +1,13 @@
+# Layer 2 FeatureScorer weights. Scores are summed and clamped to 0.0..=1.0.
+# Combined with defaults.ask_threshold (0.7) they can only escalate Allow → Ask.
+version: 1
+weights:
+  secret_path: 0.35
+  network_sink: 0.28
+  pipe_to_shell: 0.40
+  obfuscation: 0.30
+  recursive_rm: 0.25
+  writes_outside_workspace: 0.25
+  persistence_locations: 0.20
+  unknown_host: 0.27
+  large_file_body: 0.27

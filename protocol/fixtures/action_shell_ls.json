@@ -1,0 +1,12 @@
+{
+  "context": {
+    "agent": "cursor",
+    "session_id": "cur-01HZX4N8",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  },
+  "kind": "shell",
+  "raw": "ls -la src/",
+  "cwd": "/Users/dev/projects/webapp",
+  "argv_tree": { "node": "command", "argv": ["ls", "-la", "src/"] }
+}

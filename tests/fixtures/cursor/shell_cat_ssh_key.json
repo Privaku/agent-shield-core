@@ -1,0 +1,6 @@
+{
+  "hook_event_name": "beforeShellExecution",
+  "command": "cat ~/.ssh/id_rsa",
+  "cwd": "/workspace",
+  "conversation_id": "cursor-shell-ssh"
+}

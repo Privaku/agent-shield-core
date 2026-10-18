@@ -1,0 +1,7 @@
+{
+  "hook_event_name": "beforeReadFile",
+  "command": "npm test",
+  "cwd": "/workspace",
+  "file_path": "src/lib.rs",
+  "conversation_id": "cursor-event-conflict"
+}

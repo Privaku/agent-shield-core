@@ -1,0 +1,20 @@
+[package]
+name = "shield-audit"
+description = "Hash-chained JSONL audit log with redaction for Agent Shield"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+authors.workspace = true
+
+[dependencies]
+fs2 = "0.4.3"
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = "0.11.1"
+shield-core = { version = "0.1.0", path = "../shield-core" }
+thiserror = { workspace = true }
+time = { version = "0.3.55", features = ["formatting", "parsing"] }
+
+[dev-dependencies]
+tempfile = { workspace = true }

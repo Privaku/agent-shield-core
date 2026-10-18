@@ -1,0 +1,9 @@
+{
+  "tool_name": "Read",
+  "tool_input": {
+    "file_path": "src/main.rs"
+  },
+  "cwd": "/workspace",
+  "session_id": "claude-allow-read",
+  "hook_event_name": "PreToolUse"
+}

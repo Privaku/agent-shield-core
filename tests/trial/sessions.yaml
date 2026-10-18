@@ -1,0 +1,50 @@
+# Log-only trial traces from 2–3 public repos (amendment 002 item 4).
+# Commands are typical agent-session steps, never executed by the harness.
+sessions:
+  - repo: https://github.com/rust-lang/mdBook
+    name: mdBook
+    commands:
+      - git status
+      - git diff
+      - git log --oneline -20
+      - cargo fmt --all -- --check
+      - cargo clippy --all-targets -- -D warnings
+      - cargo test
+      - cargo test --all
+      - cargo build --release
+      - cargo doc --no-deps
+      - rustc --version
+      - ls src
+      - cat README.md
+      - grep -n TODO src/main.rs
+  - repo: https://github.com/pallets/flask
+    name: flask
+    commands:
+      - git status
+      - python -m pytest
+      - python -m pytest tests/
+      - python -m compileall src
+      - python -m venv .venv
+      - ruff check
+      - ruff format --check
+      - pip install -e .
+      - pip install -e ".[dev]"
+      - tox -e py
+      - ls tests
+      - cat pyproject.toml
+      - git switch -c trial/docs
+  - repo: https://github.com/expressjs/express
+    name: express
+    commands:
+      - git status
+      - npm install
+      - npm test
+      - npm run lint
+      - npm run test-ci
+      - npm outdated
+      - npm pack --dry-run
+      - node --test
+      - npx eslint lib
+      - ls lib
+      - cat package.json
+      - git log --oneline -10

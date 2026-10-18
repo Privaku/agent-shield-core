@@ -1,0 +1,17 @@
+{
+  "context": {
+    "agent": "mcp",
+    "session_id": "mcp-fetch-0a9b",
+    "cwd": "/Users/dev/projects/webapp",
+    "autonomous": false
+  },
+  "kind": "mcp_tool_call",
+  "server": "fetch",
+  "tool": "fetch",
+  "args_json": {
+    "url": "https://docs.example.com/api/reference",
+    "max_length": 5000,
+    "raw": false,
+    "headers": []
+  }
+}
